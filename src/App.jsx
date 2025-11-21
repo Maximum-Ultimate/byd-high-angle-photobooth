@@ -7,6 +7,7 @@ import backgroundPhotobooth from "./assets/img/bgPhotobooth.webp";
 import bgmPhotobooth from "./assets/sfx/bgmphotobooth.mp3";
 
 import backgroundPhotoboothVideo from "./assets/videos/bgMain.mp4";
+import bgImage from "./assets/img/background.webp";
 import bgmMain from "./assets/sfx/bgm1.mp3";
 import ChooseGenderModel from "./layouts/components/ChooseGenderModel";
 import TakePhoto from "./layouts/components/TakePhoto";
@@ -50,15 +51,23 @@ function App() {
   }, 1500);
 
   return (
-    <div class="flex flex-col items-center min-h-screen bg-cover bg-center">
-      <video
+    <div
+      class="flex flex-col items-center min-h-screen bg-cover bg-center"
+      style={{
+        "background-image": `url(${bgImage})`,
+        "background-size": "cover",
+        "background-position": "center",
+        "background-repeat": "no-repeat",
+      }}
+    >
+      {/* <video
         src={backgroundPhotoboothVideo}
         autoplay
         muted
         playsinline
         loop
         class="absolute inset-0 w-full h-full object-cover z-0"
-      />
+      /> */}
       {loading() ? (
         <Loading />
       ) : (

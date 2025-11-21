@@ -6,8 +6,13 @@ import sfxButton from "../../assets/sfx/sfxbtn.mp3";
 import sfxCountdown from "../../assets/sfx/sfxcountdown.mp3";
 import QRComponent from "../helper/QRComponent";
 
-import buttonBase from "../../assets/img/buttonBaseIdle.webp";
-import buttonBaseClicked from "../../assets/img/buttonBaseActive.webp";
+import buttonBase from "../../assets/img/btnBase.webp";
+import buttonBaseClicked from "../../assets/img/btnBaseActive.webp";
+
+import buttonBaseKanan from "../../assets/img/btnBaseKanan.webp";
+import buttonBaseKananClicked from "../../assets/img/btnBaseKananActive.webp";
+import buttonBaseKiri from "../../assets/img/btnBaseKiri.webp";
+import buttonBaseKiriClicked from "../../assets/img/btnBaseKiriActive.webp";
 
 export default function TakePhoto() {
   const [photoUrl, setPhotoUrl] = createSignal(null);
@@ -23,6 +28,8 @@ export default function TakePhoto() {
   const [params] = useSearchParams();
 
   const [isActive, setIsActive] = createSignal(false);
+  const [isKananActive, setIsKananActive] = createSignal(false);
+  const [isKiriActive, setIsKiriActive] = createSignal(false);
 
   const genderId = params.gender;
   const modelId = params.modelId;
@@ -90,7 +97,7 @@ export default function TakePhoto() {
     try {
       // Trigger pengambilan foto di backend
       await fetch(
-        "https://6qfsbdjg-8000.asse.devtunnels.ms/takephoto-landscape",
+        "https://6qfsbdjg-8000.asse.devtunnels.ms/take-photo-flexible",
         {
           headers: NGROK_HEADERS,
         }
@@ -133,128 +140,146 @@ export default function TakePhoto() {
 
   const handleRetake = () => {
     buttonSound.play();
-    if (photoUrl()) URL.revokeObjectURL(photoUrl()); // Bersihkan Blob URL lama
-    setPhotoUrl(null);
-    setIsCaptured(false);
+    setIsKiriActive(true);
+
+    setTimeout(() => {
+      setIsKiriActive(false);
+      if (photoUrl()) URL.revokeObjectURL(photoUrl()); // Bersihkan Blob URL lama
+      setPhotoUrl(null);
+      setIsCaptured(false);
+    }, 400);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     buttonSound.play();
-    setIsLoading(true);
+    setIsKananActive(true);
 
-    try {
-      await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/confirmphoto", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...NGROK_HEADERS,
-        },
-        body: JSON.stringify({ option: 2 }),
-      });
-      await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/framing", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...NGROK_HEADERS,
-        },
-        body: JSON.stringify({ option: 3 }),
-      });
-      // await fetch(
-      //   "https://6qfsbdjg-8000.asse.devtunnels.ms/uploadconfirmphoto",
-      //   {
-      //     headers: NGROK_HEADERS,
-      //   }
-      // );
+    setTimeout(async () => {
+      setIsKananActive(false);
+      setIsLoading(true);
 
-      // Ambil hasil foto dan QR code secara paralel
-      const [photoResponse, qrResponse] = await Promise.all([
-        fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getresultpath", {
-          headers: NGROK_HEADERS,
-        }),
-        fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getqrurl", {
-          headers: NGROK_HEADERS,
-        }),
-      ]);
+      try {
+        await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/confirmphoto", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...NGROK_HEADERS,
+          },
+          body: JSON.stringify({ option: 2 }),
+        });
+        await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/framing", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...NGROK_HEADERS,
+          },
+          body: JSON.stringify({ option: 3 }),
+        });
+        // await fetch(
+        //   "https://6qfsbdjg-8000.asse.devtunnels.ms/uploadconfirmphoto",
+        //   {
+        //     headers: NGROK_HEADERS,
+        //   }
+        // );
 
-      const photoData = await photoResponse.json();
-      const qrData = await qrResponse.json();
+        // Ambil hasil foto dan QR code secara paralel
+        const [photoResponse, qrResponse] = await Promise.all([
+          fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getresultpath", {
+            headers: NGROK_HEADERS,
+          }),
+          fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getqrurl", {
+            headers: NGROK_HEADERS,
+          }),
+        ]);
 
-      if (photoData?.photo) {
-        const ngrokResultPhotoPath = `https://6qfsbdjg-8000.asse.devtunnels.ms/${photoData.photo}`;
-        // Ambil foto hasil sebagai blob untuk melewati interstitial ngrok saat menampilkan gambar
-        const blobUrl = await fetchImageAsBlobUrl(ngrokResultPhotoPath);
-        if (blobUrl) {
-          setPhotoPreview(blobUrl);
+        const photoData = await photoResponse.json();
+        const qrData = await qrResponse.json();
+
+        if (photoData?.photo) {
+          const ngrokResultPhotoPath = `https://6qfsbdjg-8000.asse.devtunnels.ms/${photoData.photo}`;
+          // Ambil foto hasil sebagai blob untuk melewati interstitial ngrok saat menampilkan gambar
+          const blobUrl = await fetchImageAsBlobUrl(ngrokResultPhotoPath);
+          if (blobUrl) {
+            setPhotoPreview(blobUrl);
+          } else {
+            console.error("Foto hasil belum tersedia.");
+            // alert("Hasil foto belum tersedia. Mohon tunggu sebentar."); // Ganti dengan modal kustom
+            return;
+          }
         } else {
           console.error("Foto hasil belum tersedia.");
           // alert("Hasil foto belum tersedia. Mohon tunggu sebentar."); // Ganti dengan modal kustom
           return;
         }
-      } else {
-        console.error("Foto hasil belum tersedia.");
-        // alert("Hasil foto belum tersedia. Mohon tunggu sebentar."); // Ganti dengan modal kustom
-        return;
-      }
 
-      if (qrData?.download_url) {
-        setQrUrl(qrData.download_url);
-      } else {
-        console.error("QR URL tidak ditemukan.");
+        if (qrData?.download_url) {
+          setQrUrl(qrData.download_url);
+        } else {
+          console.error("QR URL tidak ditemukan.");
+        }
+      } catch (err) {
+        console.error("Gagal dalam salah satu proses:", err);
+        // alert("Terjadi kesalahan saat konfirmasi."); // Ganti dengan modal kustom
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error("Gagal dalam salah satu proses:", err);
-      // alert("Terjadi kesalahan saat konfirmasi."); // Ganti dengan modal kustom
-    } finally {
-      setIsLoading(false);
-    }
+    }, 400);
   };
 
-  const handlePrint = async () => {
+  const handlePrint = () => {
     setIsPrinting(true);
+    setIsKananActive(true);
 
-    try {
-      const printResponse = await fetch(
-        "https://6qfsbdjg-8000.asse.devtunnels.ms/printphoto-landscape",
-        {
-          method: "GET",
-          headers: NGROK_HEADERS,
+    setTimeout(async () => {
+      setIsKananActive(false);
+      try {
+        const printResponse = await fetch(
+          "https://6qfsbdjg-8000.asse.devtunnels.ms/print-photo-flexible",
+          {
+            method: "GET",
+            headers: NGROK_HEADERS,
+          }
+        );
+
+        if (!printResponse.ok) {
+          console.error("Failed to print the photo.");
+          // alert("Gagal mencetak foto."); // Ganti dengan modal kustom
         }
-      );
 
-      if (!printResponse.ok) {
-        console.error("Failed to print the photo.");
-        // alert("Gagal mencetak foto."); // Ganti dengan modal kustom
-      }
+        buttonSound.play();
 
-      buttonSound.play();
-
-      setTimeout(() => {
+        setTimeout(() => {
+          setIsPrinting(false);
+        }, 15000);
+      } catch (err) {
+        console.error("Error printing photo:", err);
+        // alert("Terjadi kesalahan saat mencetak foto."); // Ganti dengan modal kustom
         setIsPrinting(false);
-      }, 15000);
-    } catch (err) {
-      console.error("Error printing photo:", err);
-      // alert("Terjadi kesalahan saat mencetak foto."); // Ganti dengan modal kustom
-      setIsPrinting(false);
-    }
+      }
+    }, 400);
   };
 
   const takeNewPhoto = () => {
     buttonSound.play();
+    setIsKiriActive(true);
 
-    if (photoPreview()) URL.revokeObjectURL(photoPreview()); // Bersihkan Blob URL lama
-    setPhotoPreview(null);
-    setIsCaptured(false);
-    if (photoUrl()) URL.revokeObjectURL(photoUrl()); // Bersihkan Blob URL lama
-    setPhotoUrl(null);
+    setTimeout(() => {
+      setIsKiriActive(false);
+      if (photoPreview()) URL.revokeObjectURL(photoPreview()); // Bersihkan Blob URL lama
+      setPhotoPreview(null);
+      setIsCaptured(false);
+      if (photoUrl()) URL.revokeObjectURL(photoUrl()); // Bersihkan Blob URL lama
+      setPhotoUrl(null);
 
-    navigate("/");
+      navigate("/");
+    }, 400);
   };
 
   return (
     <div class="w-full flex flex-col items-center justify-center text-[#000511]">
       <div
         class={`w-screen h-screen flex flex-col items-center justify-center shadow-none px-5 ${styles.fadeIn}`}
-        style={{ "font-family": "MazdaFont" }}
+        style={{ "font-family": "BYDFont" }}
       >
         {/* <img
           src={logoJudul}
@@ -269,7 +294,7 @@ export default function TakePhoto() {
           {!isCaptured() ? (
             <img
               id="camera-stream"
-              src="https://6qfsbdjg-8000.asse.devtunnels.ms/stream-landscape"
+              src="https://6qfsbdjg-8000.asse.devtunnels.ms/stream-flexible"
               alt="Camera Preview"
               class="w-[1050px] h-full object-cover rounded-xl border border-white/20"
             />
@@ -311,7 +336,7 @@ export default function TakePhoto() {
               <button
                 onClick={handleCapture}
                 disabled={isCounting()}
-                class={`w-[340px] h-[100px] font-bold text-[30px] text-black transition-all duration-300 active:scale-95 uppercase tracking-widest ${
+                class={`w-[641px] h-[100px] font-bold text-[40px] text-black transition-all duration-300 active:scale-95 uppercase tracking-widest ${
                   isCounting() ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 style={{
@@ -327,11 +352,13 @@ export default function TakePhoto() {
               </button>
               <button
                 onClick={() => {
-                  navigate("/");
                   buttonSound.play();
+                  setTimeout(() => {
+                    navigate("/");
+                  }, 400);
                 }}
                 disabled={isCounting()}
-                class={`w-fit tracking-widest bg-[#212c4a] text-gray-400 bg-clip-text px-10 py-2 text-25px] rounded-full shadow-lg transition-all duration-500 active:scale-75 active:bg-indigo-800 border border-purple-300 uppercase ${
+                class={`w-fit tracking-widest bg-[#212c4a] text-white bg-clip-text px-10 py-2 text-25px] rounded-full shadow-lg transition-all duration-500 active:scale-90 active:bg-indigo-800 border border-blue-300 uppercase ${
                   isCounting() ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -339,7 +366,7 @@ export default function TakePhoto() {
               </button>
             </div>
           ) : photoPreview() ? (
-            <div class="flex flex-col gap-4 w-full">
+            <div class="flex flex-col gap-20 w-full px-52">
               {/* QR Button Section */}
               {/* <button
                 class="bg-[#212c4a] text-white text-[40px] px-3 py-2 rounded-lg shadow-md transition-all duration-500 active:scale-75 uppercase"
@@ -349,10 +376,10 @@ export default function TakePhoto() {
               </button> */}
               <div className="flex gap-6 items-stretch h-64">
                 {/* Kotak QR */}
-                <div className="w-1/3 flex items-center justify-center bg-white rounded-2xl border-2 border-gray-300 shadow-sm overflow-hidden">
+                <div className="w-fit flex items-center justify-center bg-white rounded-2xl border-2 border-gray-300 shadow-sm overflow-hidden">
                   <QRComponent
                     className="w-full h-full object-contain rounded-2xl"
-                    urlQr={qrUrl()}
+                    urlQr={"test"}
                   />
                 </div>
 
@@ -365,17 +392,32 @@ export default function TakePhoto() {
                   </p>
                 </div>
               </div>
-              <div class="flex gap-4 w-full">
+              <div class="flex justify-center gap-2 w-full">
                 <button
                   onClick={takeNewPhoto}
-                  class="w-full bg-[#212c4a] text-white px-3 py-2 text-[40px] rounded-lg uppercase shadow-md transition-all duration-500 active:scale-75"
+                  class="w-[500px] h-[70px] text-[#212c4a] text-[40px] uppercase transition-all duration-300 active:scale-90"
+                  style={{
+                    "background-image": `url(${
+                      !isKiriActive() ? buttonBaseKiri : buttonBaseKiriClicked
+                    })`,
+                    "background-size": "cover",
+                    "background-position": "center",
+                  }}
                 >
                   Take New Photo
                 </button>
                 <button
                   onClick={handlePrint}
-                  class="w-full bg-[#212c4a] text-white px-2 py-2 text-[40px] rounded-lg uppercase shadow-md transition-all duration-500 active:scale-75"
-                  hidden
+                  class="w-[500px] h-[70px] text-[#212c4a] text-[40px] uppercase transition-all duration-300 active:scale-90"
+                  style={{
+                    "background-image": `url(${
+                      !isKananActive()
+                        ? buttonBaseKanan
+                        : buttonBaseKananClicked
+                    })`,
+                    "background-size": "cover",
+                    "background-position": "center",
+                  }}
                 >
                   Print
                 </button>
@@ -406,16 +448,32 @@ export default function TakePhoto() {
                   Female
                 </button>
               </div> */}
-              <div class="flex gap-4 w-full">
+              <div class="flex justify-center gap-2 w-full">
                 <button
                   onClick={handleRetake}
-                  class="w-full bg-[#212c4a] text-white px-3 py-2 text-[40px] rounded-lg uppercase shadow-md transition-all duration-500 active:scale-75"
+                  class="w-[500px] h-[70px] text-[#00335f] text-[40px] uppercase transition-all duration-300 active:scale-90"
+                  style={{
+                    "background-image": `url(${
+                      !isKiriActive() ? buttonBaseKiri : buttonBaseKiriClicked
+                    })`,
+                    "background-size": "cover",
+                    "background-position": "center",
+                  }}
                 >
                   Retake Photo
                 </button>
                 <button
                   onClick={handleConfirm}
-                  class="w-full bg-[#212c4a] text-white px-3 py-2 text-[40px] rounded-lg uppercase shadow-md transition-all duration-500 active:scale-75"
+                  class="w-[500px] h-[70px] text-[#00335f] text-[40px] uppercase transition-all duration-300 active:scale-90"
+                  style={{
+                    "background-image": `url(${
+                      !isKananActive()
+                        ? buttonBaseKanan
+                        : buttonBaseKananClicked
+                    })`,
+                    "background-size": "cover",
+                    "background-position": "center",
+                  }}
                 >
                   Generate
                 </button>
@@ -433,7 +491,7 @@ export default function TakePhoto() {
               </p>
               <button
                 onClick={closeQrPopup}
-                class="mt-6 bg-[#212c4a] text-white px-3 py-2 rounded-lg uppercase shadow-md transition-all duration-500 active:scale-75"
+                class="mt-6 bg-[#212c4a] text-white px-3 py-2 rounded-lg uppercase shadow-md transition-all duration-500 active:scale-90"
               >
                 Close
               </button>

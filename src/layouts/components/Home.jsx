@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import styles from "../../App.module.css";
-import buttonBase from "../../assets/img/buttonBaseHome.webp";
-import buttonBaseClicked from "../../assets/img/buttonBaseActive.webp";
+import buttonBase from "../../assets/img/btnBase.webp";
+import buttonBaseClicked from "../../assets/img/btnBaseActive.webp";
 import sfxButton from "../../assets/sfx/sfxbtn.mp3";
 import backgroundHome from "../../assets/videos/bgHome.mp4";
 import { createSignal } from "solid-js";
@@ -14,8 +14,8 @@ export default function Home() {
   const isLandscape = useOrientation();
 
   const takePhotoAI = () => {
-    buttonSound.play();
     setIsActive(true);
+    buttonSound.play();
     setTimeout(() => setIsActive(false), 300);
     setTimeout(() => navigate("/take-photo"), 1000);
   };
@@ -48,17 +48,17 @@ export default function Home() {
           {/* Main Content */}
           <div
             class={`flex flex-col items-center px-5 gap-40 ${styles.fadeIn} relative z-10`}
-            style={{ "font-family": "BCAFont" }}
+            style={{ "font-family": "BYDFont" }}
           >
             <div class="flex flex-col gap-4 w-full">
               <button
                 onClick={takePhotoAI}
                 style={{
-                  "background-image": `url(${buttonBase})`,
+                  "background-image": `url(${!isActive() ? buttonBase : buttonBaseClicked})`,
                   "background-size": "cover",
                   "background-position": "center",
                 }}
-                class="w-[750px] h-[120px] font-bold mb-24 text-[60px] text-[#00774a] transition-all duration-300 active:scale-90 tracking-wide"
+                class="w-[770px] h-[120px] font-bold mb-24 text-[60px] text-[#00335f] transition-all duration-300 active:scale-90 tracking-wide"
               >
                 Buat Foto
               </button>

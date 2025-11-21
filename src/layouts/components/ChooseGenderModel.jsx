@@ -121,7 +121,7 @@ export default function ChooseGenderModel() {
           <div class="flex flex-col gap-16 mt-10 text-center">
             <p
               class="text-[65px] text-[#00774a] text-center tracking-widest leading-20"
-              style={{ "font-family": "BCAFont" }}
+              style={{ "font-family": "BYDFont" }}
             >
               Pilih Jenis Kelamin
             </p>
@@ -157,7 +157,7 @@ export default function ChooseGenderModel() {
             {/* Judul */}
             <p
               class="absolute top-[340px] text-[65px] text-[#00774a] text-center tracking-widest leading-20"
-              style={{ "font-family": "BCAFont" }}
+              style={{ "font-family": "BYDFont" }}
             >
               Pilih Karakter Mu
             </p>

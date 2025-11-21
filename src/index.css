@@ -17,8 +17,8 @@ code {
 }
 
 @font-face {
-  font-family: "BCAFont";
-  src: url("./assets/fonts/BCASans-Bold.ttf") format("opentype");
+  font-family: "BYDFont";
+  src: url("./assets/fonts/Conthrax-SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
 }

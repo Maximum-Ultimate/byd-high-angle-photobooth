@@ -14,7 +14,7 @@ function Loading(background) {
   return (
     <div
       class="min-h-screen w-full flex flex-col items-center justify-center relative text-[#000511]"
-      style={{ "font-family": "BCAFont" }}
+      style={{ "font-family": "BYDFont" }}
     >
       <div class={`flex flex-col items-center ${styles.fadeIn}`}>
         <img
@@ -24,7 +24,7 @@ function Loading(background) {
         />
         <p
           class="text-[65px] text-[#00774a] text-center tracking-widest leading-20"
-          style={{ "font-family": "BCAFont" }}
+          style={{ "font-family": "BYDFont" }}
         >
           Loading...
         </p>
