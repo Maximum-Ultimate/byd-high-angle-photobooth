@@ -1,5 +1,5 @@
 import { createSignal, onMount } from "solid-js";
-import logo from "../assets/img/logoBCA.svg";
+import logo from "../assets/img/bydLogo.webp";
 import styles from "../App.module.css";
 
 function Loading(background) {
@@ -20,10 +20,10 @@ function Loading(background) {
         <img
           src={logo}
           alt="Logo"
-          class="w-40 sm:w-56 md:w-72 lg:w-80 xl:w-96 mb-12 rounded-lg object-contain"
+          class="scale-50 mb-12 rounded-lg object-contain animate-bounce"
         />
         <p
-          class="text-[65px] text-[#00774a] text-center tracking-widest leading-20"
+          class="text-[45px] text-[#00774a] text-center tracking-widest leading-20 animate-pulse"
           style={{ "font-family": "BYDFont" }}
         >
           Loading...
