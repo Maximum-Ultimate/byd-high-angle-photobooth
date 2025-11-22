@@ -97,7 +97,7 @@ export default function TakePhoto() {
     try {
       // Trigger pengambilan foto di backend
       await fetch(
-        "https://6qfsbdjg-8000.asse.devtunnels.ms/take-photo-flexible",
+        "http://localhost:8000/take-photo-flexible",
         {
           headers: NGROK_HEADERS,
         }
@@ -105,7 +105,7 @@ export default function TakePhoto() {
 
       // Ambil path ke foto preview dari backend
       const res = await fetch(
-        "https://6qfsbdjg-8000.asse.devtunnels.ms/getpreviewpath",
+        "http://localhost:8000/getpreviewpath",
         {
           headers: NGROK_HEADERS,
         }
@@ -114,7 +114,7 @@ export default function TakePhoto() {
       console.log("Data:", data);
 
       if (data?.photo) {
-        const ngrokPhotoPath = `https://6qfsbdjg-8000.asse.devtunnels.ms/${data.photo}`;
+        const ngrokPhotoPath = `http://localhost:8000/${data.photo}`;
         // Ambil foto sebagai blob untuk melewati interstitial ngrok saat menampilkan gambar
         const blobUrl = await fetchImageAsBlobUrl(ngrokPhotoPath);
         if (blobUrl) {
@@ -159,7 +159,7 @@ export default function TakePhoto() {
       setIsLoading(true);
 
       try {
-        await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/confirmphoto", {
+        await fetch("http://localhost:8000/confirmphoto", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function TakePhoto() {
           },
           body: JSON.stringify({ option: 2 }),
         });
-        await fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/framing", {
+        await fetch("http://localhost:8000/framing", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -176,7 +176,7 @@ export default function TakePhoto() {
           body: JSON.stringify({ option: 3 }),
         });
         // await fetch(
-        //   "https://6qfsbdjg-8000.asse.devtunnels.ms/uploadconfirmphoto",
+        //   "http://localhost:8000/uploadconfirmphoto",
         //   {
         //     headers: NGROK_HEADERS,
         //   }
@@ -184,10 +184,10 @@ export default function TakePhoto() {
 
         // Ambil hasil foto dan QR code secara paralel
         const [photoResponse, qrResponse] = await Promise.all([
-          fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getresultpath", {
+          fetch("http://localhost:8000/getresultpath", {
             headers: NGROK_HEADERS,
           }),
-          fetch("https://6qfsbdjg-8000.asse.devtunnels.ms/getqrurl", {
+          fetch("http://localhost:8000/getqrurl", {
             headers: NGROK_HEADERS,
           }),
         ]);
@@ -196,7 +196,7 @@ export default function TakePhoto() {
         const qrData = await qrResponse.json();
 
         if (photoData?.photo) {
-          const ngrokResultPhotoPath = `https://6qfsbdjg-8000.asse.devtunnels.ms/${photoData.photo}`;
+          const ngrokResultPhotoPath = `http://localhost:8000/${photoData.photo}`;
           // Ambil foto hasil sebagai blob untuk melewati interstitial ngrok saat menampilkan gambar
           const blobUrl = await fetchImageAsBlobUrl(ngrokResultPhotoPath);
           if (blobUrl) {
@@ -234,7 +234,7 @@ export default function TakePhoto() {
       setIsKananActive(false);
       try {
         const printResponse = await fetch(
-          "https://6qfsbdjg-8000.asse.devtunnels.ms/print-photo-flexible",
+          "http://localhost:8000/print-photo-flexible",
           {
             method: "GET",
             headers: NGROK_HEADERS,
@@ -294,7 +294,7 @@ export default function TakePhoto() {
           {!isCaptured() ? (
             <img
               id="camera-stream"
-              src="https://6qfsbdjg-8000.asse.devtunnels.ms/stream-flexible"
+              src="http://localhost:8000/stream-flexible"
               alt="Camera Preview"
               class="w-[1050px] h-full object-cover rounded-xl border border-white/20"
             />
